@@ -147,25 +147,33 @@ h1, h2, h3, h4, h5, h6, p, label {
     margin: 0 !important;
 }
 
-/* ---------- Botão primário ---------- */
-.stButton > button[kind="primary"] {
+/* ---------- Botão primário ---------- *
+   Cobre múltiplas versões do Streamlit (kind="primary",
+   data-testid="stBaseButton-primary") e maximiza a especificidade
+   com html body para vencer estilos inline.                            */
+html body .stButton > button[kind="primary"],
+html body .stButton > button[kind="primaryFormSubmit"],
+html body button[data-testid="stBaseButton-primary"],
+html body button[data-testid="baseButton-primary"] {
     background: var(--cor-primaria) !important;
+    background-color: var(--cor-primaria) !important;
     color: #FFFFFF !important;
     border: none !important;
-    border-radius: var(--raio-md);
-    padding: 14px 28px;
-    font-weight: 600;
-    font-size: 15px;
+    border-radius: var(--raio-md) !important;
+    padding: 14px 28px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
     font-family: 'Inter', sans-serif !important;
-    transition: all 0.15s ease;
-    letter-spacing: -0.01em;
+    transition: all 0.15s ease !important;
+    letter-spacing: -0.01em !important;
 }
-/* Garante que TODO o conteúdo do botão primário fique branco */
-.stButton > button[kind="primary"] *,
-.stButton > button[kind="primary"] p,
-.stButton > button[kind="primary"] div,
-.stButton > button[kind="primary"] span {
+/* Força branco em TODOS os descendentes do botão primário
+   (cobre <p>, <div>, <span>, e até a tag <font> que o Google Translate injeta) */
+html body .stButton > button[kind="primary"] *,
+html body button[data-testid="stBaseButton-primary"] *,
+html body button[data-testid="baseButton-primary"] * {
     color: #FFFFFF !important;
+    background: transparent !important;
 }
 .stButton > button[kind="primary"]:hover {
     background: var(--cor-primaria-hover);

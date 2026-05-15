@@ -39,7 +39,7 @@ CSS_PATH = Path(__file__).parent / "styles" / "main.css"
 
 
 # ============================================================
-# Carrega o CSS externo
+# Carrega o CSS externo + meta tag anti-tradução
 # ============================================================
 def carregar_css(caminho: Path) -> None:
     """Lê o arquivo CSS e injeta na página via st.markdown."""
@@ -49,6 +49,13 @@ def carregar_css(caminho: Path) -> None:
     except FileNotFoundError:
         st.warning(f"Arquivo de estilos não encontrado: {caminho}")
 
+
+# Desativa Google Translate nesta página (evita bug com ícones Material)
+st.markdown(
+    '<meta name="google" content="notranslate">'
+    '<meta http-equiv="Content-Language" content="pt-br">',
+    unsafe_allow_html=True,
+)
 
 carregar_css(CSS_PATH)
 
