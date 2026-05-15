@@ -7,6 +7,7 @@ import base64
 import re
 import mimetypes
 from datetime import datetime
+from pathlib import Path
 
 import requests
 import streamlit as st
@@ -34,233 +35,22 @@ MIME_FALLBACK = {
     "csv": "text/csv",
 }
 
-# Paleta Sillion — preto/branco minimalista (extraído do site)
-COR_PRIMARIA = "#0A0A0A"        # quase preto (botão, logo)
-COR_PRIMARIA_HOVER = "#262626"  # cinza muito escuro (hover)
-COR_TEXTO = "#0A0A0A"           # quase preto
-COR_TEXTO_MUTED = "#737373"     # cinza médio (subtítulos)
-COR_BORDA = "#E5E5E5"           # cinza claro
-COR_BORDA_HOVER = "#A3A3A3"     # cinza médio
-COR_FUNDO = "#FFFFFF"           # branco
-COR_FUNDO_SUTIL = "#FAFAFA"     # branco quase imperceptível
+CSS_PATH = Path(__file__).parent / "styles" / "main.css"
 
 
 # ============================================================
-# CSS customizado
+# Carrega o CSS externo
 # ============================================================
-CUSTOM_CSS = f"""
-<style>
-    /* Fonte Inter — sans-serif moderna que se aproxima do design */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+def carregar_css(caminho: Path) -> None:
+    """Lê o arquivo CSS e injeta na página via st.markdown."""
+    try:
+        css = caminho.read_text(encoding="utf-8")
+        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.warning(f"Arquivo de estilos não encontrado: {caminho}")
 
-    /* Fundo branco limpo */
-    .stApp {{
-        background: {COR_FUNDO};
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }}
 
-    /* Esconde elementos padrão do Streamlit */
-    #MainMenu {{ visibility: hidden; }}
-    footer {{ visibility: hidden; }}
-    header {{ visibility: hidden; }}
-
-    /* Container principal */
-    .block-container {{
-        padding-top: 2.5rem;
-        padding-bottom: 2rem;
-        max-width: 680px;
-    }}
-
-    /* Tipografia global */
-    h1, h2, h3, h4, p, label, span, div, button {{
-        font-family: 'Inter', sans-serif !important;
-        color: {COR_TEXTO};
-    }}
-
-    /* ===== HEADER ===== */
-    .brand-header {{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-    }}
-    .brand-name {{
-        font-size: 22px;
-        font-weight: 700;
-        color: {COR_TEXTO};
-        letter-spacing: -0.02em;
-    }}
-    .brand-divider {{
-        height: 1px;
-        background: {COR_BORDA};
-        margin: 24px 0 48px;
-    }}
-
-    /* ===== TÍTULO DA PÁGINA ===== */
-    .page-title {{
-        font-size: 44px;
-        font-weight: 700;
-        color: {COR_TEXTO};
-        letter-spacing: -0.03em;
-        line-height: 1.1;
-        text-align: center;
-        margin-bottom: 12px;
-    }}
-    .page-subtitle {{
-        font-size: 16px;
-        font-weight: 400;
-        color: {COR_TEXTO_MUTED};
-        text-align: center;
-        max-width: 480px;
-        margin: 0 auto 40px;
-        line-height: 1.5;
-    }}
-
-    /* ===== CARD DO FORMULÁRIO ===== */
-    /* Streamlit não tem um wrapper direto, então usamos pseudo-card via padding/border nos elementos */
-
-    /* ===== INPUTS ===== */
-    .stTextInput > div > div > input {{
-        border-radius: 12px;
-        border: 1px solid {COR_BORDA};
-        padding: 14px 16px;
-        font-size: 15px;
-        font-family: 'Inter', sans-serif !important;
-        background: {COR_FUNDO};
-        transition: all 0.15s ease;
-    }}
-    .stTextInput > div > div > input:hover {{
-        border-color: {COR_BORDA_HOVER};
-    }}
-    .stTextInput > div > div > input:focus {{
-        border-color: {COR_PRIMARIA};
-        box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.06);
-        outline: none;
-    }}
-    .stTextInput label, .stFileUploader label {{
-        font-weight: 500 !important;
-        font-size: 14px !important;
-        color: {COR_TEXTO} !important;
-        margin-bottom: 8px !important;
-    }}
-
-    /* ===== FILE UPLOADER ===== */
-    [data-testid="stFileUploader"] section {{
-        border-radius: 12px;
-        border: 1.5px dashed {COR_BORDA};
-        background: {COR_FUNDO_SUTIL};
-        padding: 24px;
-        transition: all 0.15s ease;
-    }}
-    [data-testid="stFileUploader"] section:hover {{
-        border-color: {COR_PRIMARIA};
-        background: {COR_FUNDO};
-    }}
-    [data-testid="stFileUploader"] button {{
-        background: {COR_FUNDO} !important;
-        color: {COR_TEXTO} !important;
-        border: 1px solid {COR_BORDA} !important;
-        border-radius: 8px !important;
-        font-weight: 500 !important;
-    }}
-    [data-testid="stFileUploader"] button:hover {{
-        border-color: {COR_PRIMARIA} !important;
-    }}
-
-    /* ===== BOTÃO PRIMÁRIO ===== */
-    .stButton > button[kind="primary"] {{
-        background: {COR_PRIMARIA};
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 14px 28px;
-        font-weight: 600;
-        font-size: 15px;
-        font-family: 'Inter', sans-serif !important;
-        transition: all 0.15s ease;
-        letter-spacing: -0.01em;
-    }}
-    .stButton > button[kind="primary"]:hover {{
-        background: {COR_PRIMARIA_HOVER};
-        transform: translateY(-1px);
-    }}
-    .stButton > button[kind="primary"]:active {{
-        transform: translateY(0);
-    }}
-    .stButton > button[kind="primary"]:focus {{
-        box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.12) !important;
-    }}
-
-    /* Botão secundário (OK do dialog) */
-    .stButton > button[kind="secondary"] {{
-        background: {COR_FUNDO};
-        color: {COR_TEXTO};
-        border: 1px solid {COR_BORDA};
-        border-radius: 10px;
-        font-weight: 500;
-    }}
-
-    /* ===== ALERTAS ===== */
-    .stAlert {{
-        border-radius: 12px;
-        border: 1px solid {COR_BORDA};
-        font-family: 'Inter', sans-serif !important;
-    }}
-
-    /* ===== PREVIEW DO ARQUIVO ===== */
-    .file-preview {{
-        background: {COR_FUNDO_SUTIL};
-        border: 1px solid {COR_BORDA};
-        border-radius: 12px;
-        padding: 14px 16px;
-        margin-top: 10px;
-        font-size: 14px;
-        color: {COR_TEXTO};
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }}
-    .file-preview-icon {{
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-        background: {COR_PRIMARIA};
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        flex-shrink: 0;
-    }}
-
-    /* ===== FOOTER ===== */
-    .app-footer {{
-        text-align: center;
-        margin-top: 56px;
-        padding-top: 28px;
-        border-top: 1px solid {COR_BORDA};
-        color: {COR_TEXTO_MUTED};
-        font-size: 13px;
-        font-weight: 400;
-    }}
-    .app-footer a {{
-        color: {COR_TEXTO};
-        text-decoration: none;
-        font-weight: 500;
-    }}
-    .app-footer a:hover {{
-        text-decoration: underline;
-    }}
-
-    /* ===== DIALOG (POP-UP) ===== */
-    div[data-testid="stDialog"] > div {{
-        border-radius: 16px !important;
-        border: 1px solid {COR_BORDA} !important;
-    }}
-</style>
-"""
-
-st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+carregar_css(CSS_PATH)
 
 
 # ============================================================
