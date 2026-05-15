@@ -71,15 +71,30 @@ h1, h2, h3, h4, h5, h6, p, label {
     justify-content: space-between;
     margin-bottom: 0;
 }
+.app-navbar .brand-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+/* Logo SVG: a versão original é preta, então invertemos via filtro
+   para que apareça branca sobre o fundo navy escuro da navbar. */
+.app-navbar .brand-logo {
+    height: 28px;
+    width: auto;
+    display: block;
+    filter: brightness(0) invert(1);
+    transition: opacity 0.15s ease;
+}
+.app-navbar .brand-link:hover .brand-logo {
+    opacity: 0.85;
+}
+/* Fallback: caso o logo não carregue, mantemos o nome textual */
 .app-navbar .brand-name {
     font-family: 'Inter', sans-serif;
     font-size: 22px;
     font-weight: 700;
     color: var(--cor-texto-claro);
     letter-spacing: -0.02em;
-}
-.app-navbar .brand-name::first-letter {
-    color: var(--cor-acento);
 }
 .app-navbar .nav-links {
     display: flex;
