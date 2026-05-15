@@ -195,58 +195,48 @@ h1, h2, h3, h4, h5, h6, p, label {
 }
 
 /* ============================================================
-   FILE UPLOADER
+   FILE UPLOADER — abordagem minimalista
+   Estilizamos só a área externa e o botão; deixamos o resto
+   herdar do Streamlit pra não quebrar o layout interno.
    ============================================================ */
 [data-testid="stFileUploader"] section {
     border-radius: var(--raio-md);
     border: 1.5px dashed var(--cor-borda);
     background: var(--cor-fundo-sutil);
-    padding: 22px;
+    padding: 18px 22px;
     transition: all 0.15s ease;
 }
 [data-testid="stFileUploader"] section:hover {
     border-color: var(--cor-acento);
     background: var(--cor-fundo);
 }
+
+/* Ícone de upload padrão do Streamlit (svg/icon na esquerda) */
+[data-testid="stFileUploader"] section svg {
+    color: var(--cor-texto-muted);
+    fill: var(--cor-texto-muted);
+}
+
+/* Botão "Browse files" — navy escuro com texto branco */
 [data-testid="stFileUploader"] button {
     background: var(--cor-primaria) !important;
-    background-color: var(--cor-primaria) !important;
     color: #FFFFFF !important;
     border: 1px solid var(--cor-primaria) !important;
     border-radius: var(--raio-sm) !important;
+    padding: 6px 18px !important;
     font-weight: 500 !important;
-    padding: 8px 16px !important;
-    min-width: 120px;
+    font-size: 14px !important;
+    transition: background 0.15s ease !important;
 }
 [data-testid="stFileUploader"] button:hover {
     background: var(--cor-primaria-hover) !important;
-    background-color: var(--cor-primaria-hover) !important;
     border-color: var(--cor-primaria-hover) !important;
 }
-/* Força branco em qualquer descendente do Browse files */
-[data-testid="stFileUploader"] button,
-[data-testid="stFileUploader"] button *,
+/* Garante visibilidade do texto interno do botão */
 [data-testid="stFileUploader"] button p,
-[data-testid="stFileUploader"] button div,
-[data-testid="stFileUploader"] button span {
+[data-testid="stFileUploader"] button span:not([data-testid*="Icon"]):not([class*="material"]) {
     color: #FFFFFF !important;
-    background: transparent !important;
-}
-[data-testid="stFileUploader"] button {
-    background: var(--cor-primaria) !important;
-}
-[data-testid="stFileUploader"] button p {
     margin: 0 !important;
-}
-
-/* Esconde APENAS o ícone Material que pode quebrar via font ligature.
-   Cuidado: não usar seletores por posição (:first-child) porque o texto
-   "Browse files" pode estar no mesmo nível e ser escondido por engano. */
-[data-testid="stFileUploader"] [data-testid="stIconMaterial"],
-[data-testid="stFileUploader"] .material-icons,
-[data-testid="stFileUploader"] .material-symbols-outlined,
-[data-testid="stFileUploader"] .material-symbols-rounded {
-    display: none !important;
 }
 
 /* ============================================================
@@ -337,13 +327,14 @@ html body button[data-testid="baseButton-secondary"] * {
     height: 30px;
     border-radius: 7px;
     background: var(--cor-primaria);
-    color: white;
-    display: flex;
+    color: #FFFFFF;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
     flex-shrink: 0;
+}
+.file-preview-icon svg {
+    display: block;
 }
 .file-preview-text {
     flex: 1;
