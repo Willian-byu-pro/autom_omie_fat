@@ -68,11 +68,7 @@ st.caption("Envie o arquivo de faturamento para processamento. O relatório reto
 
 st.divider()
 
-webhook_url = st.text_input(
-    "URL do webhook N8N",
-    placeholder="https://seu-n8n.com/webhook/faturamento",
-    help="Endpoint do N8N que receberá o arquivo.",
-)
+webhook_url = st.secrets["N8N_WEBHOOK_URL"]
 
 email = st.text_input(
     "Seu email",
@@ -96,8 +92,7 @@ enviar = st.button("Enviar", type="primary", use_container_width=True)
 # ---------- Lógica de envio ----------
 if enviar:
     erros = []
-    if not webhook_url.strip():
-        erros.append("Informe a URL do webhook N8N.")
+
     if not email.strip():
         erros.append("Informe o email.")
     elif not email_valido(email):
