@@ -310,6 +310,27 @@ html body button[data-testid="baseButton-secondary"] * {
 }
 
 /* ============================================================
+   ÍCONE DE AJUDA (tooltip) — reseta background herdado
+   ============================================================ */
+html body button[aria-label^="Help for"],
+html body button[aria-label^="Ajuda para"],
+html body .stTooltipIcon button,
+html body [data-testid="stTooltipIcon"] button {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    color: var(--cor-texto-secundario, #5A7A84) !important;
+}
+html body button[aria-label^="Help for"] *,
+html body button[aria-label^="Ajuda para"] *,
+html body .stTooltipIcon button *,
+html body [data-testid="stTooltipIcon"] button * {
+    color: inherit !important;
+}
+
+/* ============================================================
    PREVIEW DO ARQUIVO SELECIONADO
    ============================================================ */
 .file-preview {
