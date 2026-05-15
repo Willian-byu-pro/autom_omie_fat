@@ -1,6 +1,11 @@
 """
 Envio de faturamento — Front Streamlit (Sillion)
 Encaminha arquivo (xlsx/xlsb/csv) + email para o backend N8N via POST JSON com base64.
+
+Arquitetura:
+- app.py        → lógica Python (config, envio, widgets de input)
+- styles/       → CSS (visual)
+- templates/    → HTML estrutural (header, hero, footer, etc.)
 """
 
 import base64
@@ -13,11 +18,18 @@ import requests
 import streamlit as st
 
 # ============================================================
+# Caminhos
+# ============================================================
+BASE_DIR = Path(__file__).parent
+CSS_PATH = BASE_DIR / "styles" / "main.css"
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+# ============================================================
 # Config da página
 # ============================================================
 st.set_page_config(
     page_title="Sillion · Envio de faturamento",
-    page_icon="",
+    page_icon="📤",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
@@ -35,28 +47,38 @@ MIME_FALLBACK = {
     "csv": "text/csv",
 }
 
-CSS_PATH = Path(__file__).parent / "styles" / "main.css"
-
 
 # ============================================================
-# Carrega o CSS externo + meta tag anti-tradução
+# Helpers de renderização (templates + CSS)
 # ============================================================
+def render_template(nome: str, **variaveis) -> str:
+    """
+    Lê um arquivo .html em templates/ e substitui placeholders no
+    formato {{nome_da_variavel}} pelos valores passados.
+    """
+    caminho = TEMPLATES_DIR / f"{nome}.html"
+    html = caminho.read_text(encoding="utf-8")
+    for chave, valor in variaveis.items():
+        html = html.replace(f"{{{{{chave}}}}}", str(valor))
+    return html
+
+
+def inject(html: str) -> None:
+    """Injeta um trecho HTML na página."""
+    st.markdown(html, unsafe_allow_html=True)
+
+
 def carregar_css(caminho: Path) -> None:
     """Lê o arquivo CSS e injeta na página via st.markdown."""
     try:
         css = caminho.read_text(encoding="utf-8")
-        st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+        inject(f"<style>{css}</style>")
     except FileNotFoundError:
         st.warning(f"Arquivo de estilos não encontrado: {caminho}")
 
 
-# Desativa Google Translate nesta página (evita bug com ícones Material)
-st.markdown(
-    '<meta name="google" content="notranslate">'
-    '<meta http-equiv="Content-Language" content="pt-br">',
-    unsafe_allow_html=True,
-)
-
+# Carrega meta tags + CSS antes de qualquer conteúdo
+inject(render_template("meta"))
 carregar_css(CSS_PATH)
 
 
@@ -70,7 +92,7 @@ except (KeyError, FileNotFoundError):
 
 
 # ============================================================
-# Helpers
+# Helpers de negócio
 # ============================================================
 def email_valido(email: str) -> bool:
     return bool(EMAIL_REGEX.match(email.strip()))
@@ -104,31 +126,16 @@ def enviar_para_n8n(url: str, payload: dict) -> requests.Response:
 
 
 # ============================================================
-# UI — Header
+# UI — Header + Hero (vindos dos templates HTML)
 # ============================================================
-st.markdown(
-    """
-    <div class="brand-header">
-        <div class="brand-name">Sillion</div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+inject(render_template("header"))
+inject(render_template(
+    "hero",
+    titulo="Envio de faturamento",
+    subtitulo="Envie o arquivo de faturamento para processamento automático. "
+              "O relatório retornará no seu email.",
+))
 
-st.markdown('<div class="brand-divider"></div>', unsafe_allow_html=True)
-
-# ============================================================
-# UI — Título e subtítulo
-# ============================================================
-st.markdown(
-    '<div class="page-title">Envio de faturamento</div>',
-    unsafe_allow_html=True,
-)
-st.markdown(
-    '<div class="page-subtitle">Envie o arquivo de faturamento para processamento automático. '
-    'O relatório retornará no seu email.</div>',
-    unsafe_allow_html=True,
-)
 
 # ============================================================
 # Verificação de configuração
@@ -141,8 +148,9 @@ if not WEBHOOK_URL:
     )
     st.stop()
 
+
 # ============================================================
-# UI — Formulário
+# UI — Formulário (widgets Streamlit — precisam falar com Python)
 # ============================================================
 email = st.text_input(
     "Email",
@@ -158,18 +166,15 @@ arquivo = st.file_uploader(
 
 if arquivo is not None:
     tamanho_mb = len(arquivo.getvalue()) / (1024 * 1024)
-    st.markdown(
-        f'''
-        <div class="file-preview">
-            <div class="file-preview-icon">✓</div>
-            <div><strong>{arquivo.name}</strong> · {tamanho_mb:.2f} MB</div>
-        </div>
-        ''',
-        unsafe_allow_html=True,
-    )
+    inject(render_template(
+        "file_preview",
+        nome_arquivo=arquivo.name,
+        tamanho_mb=f"{tamanho_mb:.2f}",
+    ))
 
 st.write("")
 enviar = st.button("Enviar arquivo", type="primary", use_container_width=True)
+
 
 # ============================================================
 # Lógica de envio
@@ -210,9 +215,7 @@ if enviar:
 
                     confirmacao()
                 else:
-                    st.error(
-                        f"O backend respondeu com status {resp.status_code}."
-                    )
+                    st.error(f"O backend respondeu com status {resp.status_code}.")
                     with st.expander("Detalhes da resposta"):
                         st.code(resp.text or "(sem corpo)")
             except requests.exceptions.Timeout:
@@ -222,15 +225,8 @@ if enviar:
             except Exception as exc:
                 st.error(f"Erro inesperado: {exc}")
 
+
 # ============================================================
-# Footer
+# UI — Footer (vindo do template HTML)
 # ============================================================
-st.markdown(
-    f"""
-    <div class="app-footer">
-        © {datetime.now().year} <a href="https://www.sillion.com.br/" target="_blank">Sillion</a>
-        · Plataforma interna de processamento
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+inject(render_template("footer", ano=datetime.now().year))
