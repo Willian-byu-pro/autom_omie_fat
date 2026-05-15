@@ -195,28 +195,42 @@ h1, h2, h3, h4, h5, h6, p, label {
 }
 [data-testid="stFileUploader"] button {
     background: var(--cor-primaria) !important;
+    background-color: var(--cor-primaria) !important;
     color: #FFFFFF !important;
     border: 1px solid var(--cor-primaria) !important;
     border-radius: var(--raio-sm) !important;
     font-weight: 500 !important;
     padding: 8px 16px !important;
+    min-width: 120px;
 }
 [data-testid="stFileUploader"] button:hover {
     background: var(--cor-primaria-hover) !important;
+    background-color: var(--cor-primaria-hover) !important;
     border-color: var(--cor-primaria-hover) !important;
 }
-[data-testid="stFileUploader"] button p {
+/* Força branco em qualquer descendente do Browse files */
+[data-testid="stFileUploader"] button,
+[data-testid="stFileUploader"] button *,
+[data-testid="stFileUploader"] button p,
+[data-testid="stFileUploader"] button div,
+[data-testid="stFileUploader"] button span {
     color: #FFFFFF !important;
+    background: transparent !important;
+}
+[data-testid="stFileUploader"] button {
+    background: var(--cor-primaria) !important;
+}
+[data-testid="stFileUploader"] button p {
     margin: 0 !important;
 }
 
-/* MATA o ícone Material que vira "upload" quando Google Translate
-   ou qualquer outra interferência quebra a font ligature.
-   O texto do botão ("Browse files"/"Upload") já basta como rótulo. */
-[data-testid="stFileUploader"] button [data-testid="stIconMaterial"],
-[data-testid="stFileUploader"] button > div > span:first-child:not([class*="text"]),
-[data-testid="stFileUploader"] [class*="material-icon"],
-[data-testid="stFileUploader"] [class*="material-symbol"] {
+/* Esconde APENAS o ícone Material que pode quebrar via font ligature.
+   Cuidado: não usar seletores por posição (:first-child) porque o texto
+   "Browse files" pode estar no mesmo nível e ser escondido por engano. */
+[data-testid="stFileUploader"] [data-testid="stIconMaterial"],
+[data-testid="stFileUploader"] .material-icons,
+[data-testid="stFileUploader"] .material-symbols-outlined,
+[data-testid="stFileUploader"] .material-symbols-rounded {
     display: none !important;
 }
 
@@ -255,6 +269,37 @@ html body button[data-testid="stBaseButton-primary"]:active {
 html body .stButton > button[kind="primary"] *,
 html body button[data-testid="stBaseButton-primary"] *,
 html body button[data-testid="baseButton-primary"] * {
+    color: #FFFFFF !important;
+    background: transparent !important;
+}
+
+/* ============================================================
+   BOTÃO SECUNDÁRIO (ex: OK do dialog)
+   ============================================================ */
+html body .stButton > button[kind="secondary"],
+html body button[data-testid="stBaseButton-secondary"],
+html body button[data-testid="baseButton-secondary"] {
+    background: var(--cor-primaria) !important;
+    background-color: var(--cor-primaria) !important;
+    color: #FFFFFF !important;
+    border: 1px solid var(--cor-primaria) !important;
+    border-radius: var(--raio-md) !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.15s ease !important;
+}
+html body .stButton > button[kind="secondary"]:hover,
+html body button[data-testid="stBaseButton-secondary"]:hover {
+    background: var(--cor-primaria-hover) !important;
+    background-color: var(--cor-primaria-hover) !important;
+    border-color: var(--cor-primaria-hover) !important;
+    transform: translateY(-1px);
+}
+html body .stButton > button[kind="secondary"] *,
+html body button[data-testid="stBaseButton-secondary"] *,
+html body button[data-testid="baseButton-secondary"] * {
     color: #FFFFFF !important;
     background: transparent !important;
 }
