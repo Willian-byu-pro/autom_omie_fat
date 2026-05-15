@@ -23,6 +23,26 @@ import streamlit as st
 BASE_DIR = Path(__file__).parent
 CSS_PATH = BASE_DIR / "styles" / "main.css"
 TEMPLATES_DIR = BASE_DIR / "templates"
+STATIC_DIR = BASE_DIR / "static"
+
+# ============================================================
+# Recursos externos
+# ============================================================
+LOGO_EXTERNO = "https://www.sillion.com.br/wp-content/themes/sillion/images/logo-black-tm.svg"
+LOGO_LOCAL_FILE = STATIC_DIR / "logo-sillion.svg"
+
+
+def resolver_logo_url() -> str:
+    """
+    Retorna o caminho do logo:
+    - Se houver `static/logo-sillion.svg`, usa a versão local (mais rápida e offline).
+    - Caso contrário, cai para a URL externa do site da Sillion.
+    Streamlit sanitiza o atributo `onerror` em HTML, então o fallback
+    precisa ser feito no Python, não no navegador.
+    """
+    if LOGO_LOCAL_FILE.exists():
+        return "app/static/logo-sillion.svg"
+    return LOGO_EXTERNO
 
 # ============================================================
 # Config da página
@@ -128,7 +148,7 @@ def enviar_para_n8n(url: str, payload: dict) -> requests.Response:
 # ============================================================
 # UI — Header + Hero (vindos dos templates HTML)
 # ============================================================
-inject(render_template("header"))
+inject(render_template("header", logo_url=resolver_logo_url()))
 inject(render_template(
     "hero",
     titulo="Envio de faturamento",
