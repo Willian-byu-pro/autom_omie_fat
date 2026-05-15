@@ -39,7 +39,11 @@ header    { visibility: hidden; }
     max-width: 680px;
 }
 
-h1, h2, h3, h4, p, label, span, div, button {
+/* Tipografia: aplicada apenas em elementos de texto explícitos.
+   .stApp já define Inter no body, então tudo herda naturalmente.
+   NÃO sobrescrevemos span/div/button para preservar fontes especiais
+   (ícones Material, code, etc.). */
+h1, h2, h3, h4, h5, h6, p, label {
     font-family: 'Inter', sans-serif !important;
     color: var(--cor-texto);
 }
@@ -52,6 +56,7 @@ h1, h2, h3, h4, p, label, span, div, button {
     margin-bottom: 8px;
 }
 .brand-name {
+    font-family: 'Inter', sans-serif;
     font-size: 22px;
     font-weight: 700;
     color: var(--cor-texto);
@@ -65,6 +70,7 @@ h1, h2, h3, h4, p, label, span, div, button {
 
 /* ---------- Título da página ---------- */
 .page-title {
+    font-family: 'Inter', sans-serif;
     font-size: 44px;
     font-weight: 700;
     color: var(--cor-texto);
@@ -74,6 +80,7 @@ h1, h2, h3, h4, p, label, span, div, button {
     margin-bottom: 12px;
 }
 .page-subtitle {
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 400;
     color: var(--cor-texto-muted);
@@ -127,16 +134,24 @@ h1, h2, h3, h4, p, label, span, div, button {
     border: 1px solid var(--cor-borda) !important;
     border-radius: var(--raio-sm) !important;
     font-weight: 500 !important;
+    min-width: 120px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px;
 }
 [data-testid="stFileUploader"] button:hover {
     border-color: var(--cor-primaria) !important;
 }
+[data-testid="stFileUploader"] button > div > p {
+    margin: 0 !important;
+}
 
 /* ---------- Botão primário ---------- */
 .stButton > button[kind="primary"] {
-    background: var(--cor-primaria);
-    color: white;
-    border: none;
+    background: var(--cor-primaria) !important;
+    color: #FFFFFF !important;
+    border: none !important;
     border-radius: var(--raio-md);
     padding: 14px 28px;
     font-weight: 600;
@@ -144,6 +159,13 @@ h1, h2, h3, h4, p, label, span, div, button {
     font-family: 'Inter', sans-serif !important;
     transition: all 0.15s ease;
     letter-spacing: -0.01em;
+}
+/* Garante que TODO o conteúdo do botão primário fique branco */
+.stButton > button[kind="primary"] *,
+.stButton > button[kind="primary"] p,
+.stButton > button[kind="primary"] div,
+.stButton > button[kind="primary"] span {
+    color: #FFFFFF !important;
 }
 .stButton > button[kind="primary"]:hover {
     background: var(--cor-primaria-hover);
