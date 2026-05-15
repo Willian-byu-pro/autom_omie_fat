@@ -1,0 +1,17 @@
+# ============================================================
+# Tema do Streamlit — Sillion (preto/branco minimalista)
+# Alinhado com a identidade visual do site sillion.com.br
+# ============================================================
+
+[theme]
+primaryColor = "#0A0A0A"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#FAFAFA"
+textColor = "#0A0A0A"
+font = "sans serif"
+
+[server]
+maxUploadSize = 200
+
+[browser]
+gatherUsageStats = false
